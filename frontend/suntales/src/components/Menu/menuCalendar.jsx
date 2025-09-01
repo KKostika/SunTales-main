@@ -3,7 +3,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { Card, Modal, Button } from 'react-bootstrap';
-import api from '../services/api';
+import api from '../../services/api';
 import MenuForm from './menuForm';
 
 function WeeklyMenuCalendar() {

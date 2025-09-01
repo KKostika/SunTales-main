@@ -3,8 +3,8 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { Modal, Button, Form } from 'react-bootstrap';
-import api from '../services/api';
-import { getRole, getUserId } from '../services/tokenUtils';
+import api from '../../services/api';
+import { getRole, getUserId } from '../../services/tokenUtils';
 
 function Meals() {
   const [students, setStudents] = useState([]);

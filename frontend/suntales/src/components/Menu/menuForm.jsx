@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
-import api from '../services/api';
+import api from '../../services/api';
 
 function MenuForm({ selectedDate, existingMenu, refreshMenus }) {
   const [breakfast, setBreakfast] = useState('');
