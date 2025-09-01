@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, ListGroup, Form, Button, Modal } from 'react-bootstrap';
-import api from '../services/api';
-import { getRole } from '../services/tokenUtils';
+import api from '../../services/api';
+import { getRole } from '../../services/tokenUtils';
 
 const StudentCard = ({ student, role, currentUserId, onTrackMeal, onEdit }) => {
   const [mealLevel, setMealLevel] = useState(2);
@@ -14,7 +14,8 @@ const StudentCard = ({ student, role, currentUserId, onTrackMeal, onEdit }) => {
   const mealLabels = ['🐦 Bird skip', '🐭 Mouse nibble', '🐼 Panda munch', '🦁 Lion feast'];
   const userRole = getRole();
   const parentUserIds = student.parent_details?.map(p => Number(p.user_id)) || [];
-  const canEdit = userRole === 'admin' || (userRole === 'parent' && parentUserIds.includes(currentUserId));
+  const canEdit = userRole === 'admin' || (userRole === 'parent' && parentUserIds.includes(Number(currentUserId)));
+
 
   useEffect(() => {
     setEditedAllergies(student.allergies || '');
@@ -71,6 +72,27 @@ const StudentCard = ({ student, role, currentUserId, onTrackMeal, onEdit }) => {
     }
   };
 
+
+  const updateClassroom = async () => {
+    try {
+      const response = await api.patch(`/students/${student.id}/`, {
+        classroom_id: selectedClassroomId
+      });
+
+      alert('Η τάξη ενημερώθηκε με επιτυχία!');
+      setShowClassroomModal(false);
+
+    } catch (err) {
+      if (err.response?.data?.classroom_id) {
+        alert(`Σφάλμα: ${err.response.data.classroom_id.join(', ')}`);
+      } else {
+        alert('Failed to update.Please try again');
+      }
+      console.error('Update error:', err);
+    }
+  };
+
+
   const handleDelete = async (studentId) => {
     if (!window.confirm('Are you sure you want to delete this student?')) return;
 
@@ -84,7 +106,13 @@ const StudentCard = ({ student, role, currentUserId, onTrackMeal, onEdit }) => {
       console.error('Delete error:', error);
       alert('Failed to delete student.');
     }
+    
+
   };
+  console.log('User role:', userRole);
+    console.log('Current user ID:', currentUserId);
+    console.log('Parent user IDs:', parentUserIds);
+    console.log('Can edit:', canEdit);
 
 
   return (
@@ -92,14 +120,14 @@ const StudentCard = ({ student, role, currentUserId, onTrackMeal, onEdit }) => {
       <Card className="shadow-sm mb-4">
         <Card.Body>
           <Card.Title>{student.name ?? 'No Name'}</Card.Title>
-
-          <Button variant="warning" className="mt-2 me-2" onClick={() => onEdit(student)}>
-            Edit Student
-          </Button>
-
+          {userRole !== 'parent' && (
+            <Button variant="warning" className="mt-2 me-2" onClick={() => onEdit(student)}>
+              Edit Student
+            </Button>
+          )}
           <ListGroup variant="flush" className="mb-3">
             <ListGroup.Item><strong>Age:</strong> {student.age ?? '—'}</ListGroup.Item>
-            <ListGroup.Item><strong>Classroom:</strong> {student.classroom?.name ?? '—'}</ListGroup.Item>
+            <ListGroup.Item><strong>Classroom:</strong> {student.classroom?.name ?? '—'} </ListGroup.Item>
           </ListGroup>
 
           {student.teacher_details && (
@@ -113,25 +141,26 @@ const StudentCard = ({ student, role, currentUserId, onTrackMeal, onEdit }) => {
               👨‍👩‍👧 View Parent Info
             </Button>
           )}
-
-          <Form.Group controlId={`menu.lunch-${student.id}`} className="mt-3">
-            <Form.Label>
-              {todayMenu?.lunch
-                ? `${todayMenu.lunch}: ${mealLabels[mealLevel]}`
-                : `Today's Lunch: ${mealLabels[mealLevel]}`}
-            </Form.Label>
-            <Form.Range
-              min={0}
-              max={3}
-              value={mealLevel}
-              onChange={(e) => setMealLevel(parseInt(e.target.value))}
-            />
-          </Form.Group>
-
-          <Button variant="primary" className="mt-2" onClick={handleSubmitMeal}>
-            Track: {mealLabels[mealLevel]} (Lunch)
-          </Button>
-
+          {userRole !== 'parent' && (
+            <Form.Group controlId={`menu.lunch-${student.id}`} className="mt-3">
+              <Form.Label>
+                {todayMenu?.lunch
+                  ? `${todayMenu.lunch}: ${mealLabels[mealLevel]}`
+                  : `Today's Lunch: ${mealLabels[mealLevel]}`}
+              </Form.Label>
+              <Form.Range
+                min={0}
+                max={3}
+                value={mealLevel}
+                onChange={(e) => setMealLevel(parseInt(e.target.value))}
+              />
+            </Form.Group>
+          )}
+          {userRole !== 'parent' && (
+            <Button variant="primary" className="mt-2" onClick={handleSubmitMeal}>
+              Track: {mealLabels[mealLevel]} (Lunch)
+            </Button>
+          )}
           <Form.Group controlId={`allergies-${student.id}`} className="mt-3">
             <Form.Label>Medical Information / Allergies</Form.Label>
             <Form.Control
@@ -151,19 +180,20 @@ const StudentCard = ({ student, role, currentUserId, onTrackMeal, onEdit }) => {
           >
             {isSaving ? 'Saving...' : 'Save Medical Information'}
           </Button>
-
-          <Button
-            variant="danger"
-            className="mt-2"
-            onClick={() => handleDelete(student.id)}
-          >
-            Delete Student
-          </Button>
+          {userRole !== 'parent' && (
+            <Button
+              variant="danger"
+              className="mt-2"
+              onClick={() => handleDelete(student.id)}
+            >
+              Delete Student
+            </Button>
+          )}
         </Card.Body>
       </Card>
 
       {/* Teacher Modal */}
-      <Modal show={showTeacherModal} onHide={() => setShowTeacherModal(false)}>
+      <Modal show={showTeacherModal} centered onHide={() => setShowTeacherModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Teacher Info</Modal.Title>
         </Modal.Header>
@@ -178,7 +208,7 @@ const StudentCard = ({ student, role, currentUserId, onTrackMeal, onEdit }) => {
       </Modal>
 
       {/* Parent Modal */}
-      <Modal show={showParentModal} onHide={() => setShowParentModal(false)}>
+      <Modal show={showParentModal} centered onHide={() => setShowParentModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Parent Info</Modal.Title>
         </Modal.Header>
@@ -195,13 +225,13 @@ const StudentCard = ({ student, role, currentUserId, onTrackMeal, onEdit }) => {
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowParentModal(false)}>Close</Button>
         </Modal.Footer>
+
       </Modal>
     </>
   );
 };
 
 export default StudentCard;
-
 
 
 

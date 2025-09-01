@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import StudentCard from './StudentCard';
 import { useNavigate } from 'react-router-dom';
+import { getRole, getUserId } from '../../services/tokenUtils';
 import {
   Container,
   Row,
@@ -11,7 +12,7 @@ import {
   Modal,
   Form
 } from 'react-bootstrap';
-import api from '../services/api';
+import api from '../../services/api';
 
 const StudentList = () => {
   const [students, setStudents] = useState([]);
@@ -28,7 +29,8 @@ const StudentList = () => {
     teacher: '',
     parentId: ''
   });
-
+  const userRole = getRole();
+  const currentUserId = getUserId();
   const [parents, setParents] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [classrooms, setClassrooms] = useState([]);
@@ -46,40 +48,48 @@ const StudentList = () => {
     setShowModal(true);
   };
 
-  const handleUpdateStudent = async () => {
-    if (!formData.age || isNaN(formData.age) || Number(formData.age) <= 0) {
-      alert('Η ηλικία πρέπει να είναι έγκυρος αριθμός μεγαλύτερος του 0.');
-      return;
-    }
+ const handleUpdateStudent = async () => {
+  if (!formData.age || isNaN(formData.age) || Number(formData.age) <= 0) {
+    alert('Age must be a valid number greater than 0.');
+    return;
+  }
 
-    try {
-      await api.patch(`/students/${formData.id}/`, {
-        name: formData.name,
-        age: Number(formData.age),
-        classroom: Number(formData.classroom),
-        teacher: Number(formData.teacher)
-      });
+  try {
+    const res = await api.patch(`/students/${formData.id}/`, {
+      name: formData.name,
+      age: Number(formData.age),
+      classroom_id: Number(formData.classroom),
+      teacher: Number(formData.teacher)
+    });
 
-      setStudents(prev =>
-        prev.map(s => (s.id === formData.id ? { ...s, ...formData } : s))
-      );
+    const updatedStudent = res.data;
 
-      alert('Ο μαθητής ενημερώθηκε!');
-      setShowModal(false);
-    } catch (err) {
-      console.error('Error updating student:', err);
-    }
-  };
+    setStudents(prev =>
+      prev.map(s => (s.id === updatedStudent.id ? updatedStudent : s))
+    );
+
+    alert('Student Updated!');
+
+    // Καθαρισμός φόρμας και modal
+    setFormData({ id: '', name: '', age: '', classroom: '', teacher: '', parentId: '' });
+    setSelectedStudent(null);
+    setShowModal(false);
+  } catch (err) {
+    console.error('Error updating student:', err);
+    alert('Fail to update Student.Try again.');
+  }
+};
+
 
   const handleSubmit = async () => {
     if (!formData.age || isNaN(formData.age) || Number(formData.age) <= 0) {
-      alert('Η ηλικία πρέπει να είναι έγκυρος αριθμός μεγαλύτερος του 0.');
+      alert('Age must be a valid number greater than 0.');
       return;
     }
 
     const parentExists = parents.some(p => p.id === Number(formData.parentId));
     if (!parentExists) {
-      alert('Ο γονέας δεν υπάρχει ή δεν έχει φορτωθεί σωστά.');
+      alert('Parent not valid.');
       return;
     }
 
@@ -87,7 +97,7 @@ const StudentList = () => {
       const res = await api.post('/students/', {
         name: formData.name,
         age: Number(formData.age),
-        classroom: Number(formData.classroom),
+        classroom_id: Number(formData.classroom),
         teacher: Number(formData.teacher),
         enrollment_date: new Date().toISOString().split('T')[0],
         parents: [Number(formData.parentId)]
@@ -95,7 +105,7 @@ const StudentList = () => {
 
       const newStudent = res.data;
       setStudents(prev => [...prev, newStudent]);
-      alert('Ο μαθητής προστέθηκε!');
+      alert('Student created!');
       setShowModal(false);
       setFormData({ id: '', name: '', age: '', classroom: '', teacher: '', parentId: '' });
     } catch (err) {
@@ -117,6 +127,8 @@ useEffect(() => {
           ? studentsRes.data
           : studentsRes.data.results;
         setStudents(studentsData);
+      
+
 
         // 2. Raw parents array
         const rawParents = Array.isArray(parentsRes.data)
@@ -124,6 +136,7 @@ useEffect(() => {
           : parentsRes.data.results;
 
         console.log("rawParents from API:", rawParents);
+        
 
         // 3. Κάνουμε map για να συμπληρώσουμε το name
         const mappedParents = rawParents.map(p => ({
@@ -135,6 +148,7 @@ useEffect(() => {
         }));
 
         console.log("mappedParents:", mappedParents);
+        
         setParents(mappedParents);
 
         // 4. Classrooms
@@ -196,6 +210,7 @@ useEffect(() => {
 
   const handleDeleteStudent = (id) => {
     setStudents(prev => prev.filter(s => s.id !== id));
+    setSelectedStudent(null);
   };
 
 
@@ -235,9 +250,15 @@ useEffect(() => {
   return (
     <Container className="mt-4">
       <h2 className="mb-4 text-center">Student List</h2>
-      <Row className="mb-3 justify-content-between align-items-center">
+      
+      {userRole !== 'parent' && (
+      <Row className="mb-3 justify-content-between align-items-center" >\
         <Col md={4}>
-          <Button className="mb-3" onClick={() => setShowModal(true)}>
+          <Button className="mb-3" onClick={() => {
+            setFormData({ id: '', name: '', age: '', classroom: '', teacher: '', parentId: '' });
+            setSelectedStudent(null); // αν χρησιμοποιείς αυτό
+            setShowModal(true);
+          }}>
             Add Student
           </Button>
         </Col>
@@ -251,6 +272,8 @@ useEffect(() => {
           />
         </Col>
       </Row>
+      )}
+      
 
       {error && <Alert variant="danger">{error}</Alert>}
       {loading ? (
@@ -268,6 +291,7 @@ useEffect(() => {
               <StudentCard
                 student={selectedStudent}
                 onTrackMeal={handleTrackMeal}
+                currentUserId={currentUserId}
                 onEdit={handleEditStudent}
                 onDelete={handleDeleteStudent}
               />
@@ -278,6 +302,7 @@ useEffect(() => {
                 <StudentCard
                   student={student}
                   onTrackMeal={handleTrackMeal}
+                  currentUserId={currentUserId}
                   onEdit={handleEditStudent}
                   onDelete={handleDeleteStudent}
                 />
@@ -366,6 +391,7 @@ useEffect(() => {
           </Button>
         </Modal.Footer>
       </Modal>
+      
     </Container>
   );
 };
