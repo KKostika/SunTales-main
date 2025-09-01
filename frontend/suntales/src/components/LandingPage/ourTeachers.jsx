@@ -1,12 +1,12 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Miss_E from '../assets/images/teachers/Miss_E.jpg';
-import Miss_N from '../assets/images/teachers/Miss_N.jpg';
-import Miss_V from  '../assets/images/teachers/Miss_V.jpg';
-import Mr_A from '../assets/images/teachers/Mr_A.jpg';
-import Mr_F from '../assets/images/teachers/Mr_F.jpg';
-import Mr_G from '../assets/images/teachers/Mr_G.jpg';
+import Miss_E from '../../assets/images/teachers/Miss_E.jpg';
+import Miss_N from '../../assets/images/teachers/Miss_N.jpg';
+import Miss_V from  '../../assets/images/teachers/Miss_V.jpg';
+import Mr_A from '../../assets/images/teachers/Mr_A.jpg';
+import Mr_F from '../../assets/images/teachers/Mr_F.jpg';
+import Mr_G from '../../assets/images/teachers/Mr_G.jpg';
 import Image from 'react-bootstrap/Image';
 
 

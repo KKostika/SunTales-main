@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import Carousel from 'react-bootstrap/Carousel';
-import duckInClass from '../assets/images/ducksInClass.jpg';
-import Adventure from '../assets/images/Adventures.jpg';
-import Yummy from '../assets/images/Yummy.jpg';
-import financial from '../assets/images/financial.jpg';
+import duckInClass from '../../assets/images/ducksinClass.jpg';
+import Adventure from '../../assets/images/Adventures.jpg';
+import Yummy from '../../assets/images/Yummy.jpg';
+import financial from '../../assets/images/financial.jpg';
 
 
 
@@ -27,15 +27,15 @@ var heroData = [
     title: "Quack & Snack",
     description: "Explore this week’s nutritious menu and stay informed on your child’s daily eating",
     image: Yummy,
-    link:'/meals'
+    link:'#meals'
 },
-{
-    id: 4,
-    title: "Financial Overview",
-    description: "Clear insights into tuition schedules, upcoming payments, and essential budget allocations for your child’s learning journey",
-    image: financial,
-    link:"/financial"
-}
+// {
+//     id: 4,
+//     title: "Financial Overview",
+//     description: "Clear insights into tuition schedules, upcoming payments, and essential budget allocations for your child’s learning journey",
+//     image: financial,
+//     link:"/financial"
+// }
 ]
 
 function Landing() {
