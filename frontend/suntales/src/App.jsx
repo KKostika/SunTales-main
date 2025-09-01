@@ -9,7 +9,7 @@ import Login from './components/LoginPage';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Landing from './components/landingPage';
 import ProtectedRoute from './services/protectedRoutes.jsx';
-import Dashboard from './components/Dashboard';
+import Dashboard from './components/Dashboard/Dashboard.jsx';
 import UserManagement from './components/UserManagments';
 import StudentList from './components/StudentList';
 import ParentList from './components/ParentList';
