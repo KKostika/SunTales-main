@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Spinner } from 'react-bootstrap';
-import api from '../services/api';
+import api from '../../services/api';
 
 function ParentList() {
   const [parents, setParents] = useState([]);
@@ -163,3 +163,4 @@ function ParentList() {
 }
 
 export default ParentList;
+

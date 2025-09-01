@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
-import api from '../services/api';
-import { getRole } from '../services/tokenUtils';
+import api from '../../services/api';
+import { getRole } from '../../services/tokenUtils';
 
 function UserManagement() {
   const role = getRole();
@@ -253,4 +253,3 @@ function UserManagement() {
 }
 
 export default UserManagement;
-

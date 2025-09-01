@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
-import api from '../services/api';
+import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
 function FinancialRecords() {
@@ -95,7 +95,7 @@ function FinancialRecords() {
         });
         setShowModal(true);
       }}>
-        Add Record
+        Add Invoices
       </Button>
 
       <Table striped bordered hover>

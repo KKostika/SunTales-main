@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
-import api from '../services/api';
+import api from '../../services/api';
 
 function ClassroomList() {
   const [classrooms, setClassrooms] = useState([]);

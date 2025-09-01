@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api from '../../services/api';
 
 function TeacherList() {
   const [teachers, setTeachers] = useState([]);
@@ -33,6 +33,7 @@ function TeacherList() {
       .then(res => setTeacherUsers(res.data))
       .catch(err => {
         console.error('Error fetching teacher users:', err);
+        console.log(res.data)
         if (err.response?.status === 401) navigate('/login');
       });
   };
