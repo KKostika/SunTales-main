@@ -1,25 +1,25 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import Header from './components/header';
-import About from './components/about';
-import Teachers from './components/ourTeachers.jsx';
-import Contact from './components/contact';
+import About from './components/LandingPage/about';
+import Teachers from './components/LandingPage/ourTeachers.jsx';
+import Contact from './components/LandingPage/contact.jsx';
 import Footer from './components/footer';
 import Login from './components/LoginPage';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Landing from './components/landingPage';
+import Landing from './components/LandingPage/landingPage.jsx';
 import ProtectedRoute from './services/protectedRoutes.jsx';
 import Dashboard from './components/Dashboard/Dashboard.jsx';
-import UserManagement from './components/UserManagments';
-import StudentList from './components/StudentList';
-import ParentList from './components/ParentList';
-import TeachersList from './components/TeacherList.jsx';
+import UserManagement from './components/Managment/UserManagments.jsx';
+import StudentList from './components/Students/StudentList.jsx';
+import ParentList from './components/Managment/ParentList.jsx';
+import TeachersList from './components/Managment/TeacherList.jsx';
 import api from './services/api';
-import AddClassroomForm from './components/classroomList.jsx';
-import WeeklyMenuCalendar from './components/menuCalendar.jsx'
-import Meals from './components/Meals.jsx';
-import FinancialRecords from './components/Invoices.jsx';
-import ActivitiesPage from './components/activitiesPage.jsx';
+import AddClassroomForm from './components/Managment/classroomList.jsx';
+import WeeklyMenuCalendar from './components/Menu/menuCalendar.jsx'
+import Meals from './components/Menu/Meals.jsx';
+import FinancialRecords from './components/Managment/Invoices.jsx';
+import ActivitiesPage from './components/Activities/activitiesPage.jsx';
 
 
 
