@@ -54,6 +54,7 @@ function Header() {
 
             {isLoggedIn && role === "admin" && (
               <>
+                <Nav.Link onClick={() => handleNavigate('/dashboard')}>Dashboard</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/students')}>Students</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/parents')}>Parents</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/teachers')}>Teachers</Nav.Link>
