@@ -35,6 +35,8 @@ const DashboardCalendar = ({ role }) => {
   };
 
   const handleAddEvent = () => {
+    if (role !== 'admin') return; // 🔒 Μόνο admin μπορεί να προσθέσει
+
     if (!newEvent.date || !newEvent.title) {
       setFormError('Παρακαλώ συμπληρώστε τουλάχιστον ημερομηνία και τίτλο.');
       return;
@@ -60,6 +62,8 @@ const DashboardCalendar = ({ role }) => {
   };
 
   const handleDeleteEvent = (id) => {
+    if (role !== 'admin') return; // 🔒 Μόνο admin μπορεί να διαγράψει
+
     api.delete(`/events/${id}/`)
       .then(() => {
         fetchEvents();
@@ -75,6 +79,7 @@ const DashboardCalendar = ({ role }) => {
   };
 
   const handleDateClick = (info) => {
+    if (role !== 'admin') return; // 🔒 Μόνο admin μπορεί να ανοίξει modal προσθήκης
     setNewEvent({ ...newEvent, date: info.dateStr });
     setFormError('');
     setShowEventModal(true);
@@ -90,11 +95,12 @@ const DashboardCalendar = ({ role }) => {
           events={events}
           height="auto"
           contentHeight="auto"
-          dateClick={role === 'admin' ? handleDateClick : null}
+          dateClick={handleDateClick}
           eventClick={handleEventClick}
         />
       </div>
 
+      {/* Modal Προσθήκης Εκδήλωσης - Μόνο για Admin */}
       {role === 'admin' && (
         <Modal show={showEventModal} onHide={() => {
           setShowEventModal(false);
@@ -147,6 +153,7 @@ const DashboardCalendar = ({ role }) => {
         </Modal>
       )}
 
+      {/* Modal Λεπτομερειών Εκδήλωσης */}
       <Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Λεπτομέρειες Εκδήλωσης</Modal.Title>
@@ -162,14 +169,14 @@ const DashboardCalendar = ({ role }) => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDetailsModal(false)}>Close</Button>
+          <Button variant="secondary" onClick={() => setShowDetailsModal(false)}>Κλείσιμο</Button>
           {role === 'admin' && (
             <Button variant="danger" onClick={() => {
-              if (window.confirm('Are you sure you want to delete this event?')) {
+              if (window.confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή την εκδήλωση;')) {
                 handleDeleteEvent(selectedEvent.id);
               }
             }}>
-              Delete
+              Διαγραφή
             </Button>
           )}
         </Modal.Footer>

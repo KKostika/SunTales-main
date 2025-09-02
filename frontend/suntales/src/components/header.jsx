@@ -72,6 +72,7 @@ function Header() {
 
             {isLoggedIn && role === 'teacher' && (
               <>
+                <Nav.Link onClick={() => handleNavigate('/dashboard')}>Dashboard</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/students')}>Students</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/activities')}>Activities</Nav.Link>
                 {/* <Nav.Link onClick={() => handleNavigate('/messages')}>Messages</Nav.Link> */}
@@ -82,10 +83,11 @@ function Header() {
             {isLoggedIn && role === 'parent' && (
               <>
                 {/* <Nav.Link onClick={() => handleNavigate('/parents')}>Parents</Nav.Link> */}
+                <Nav.Link onClick={() => handleNavigate('/dashboard')}>Dashboard</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/activities')}>Activities</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/students')}>Students</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/financial_records')}>Invoices</Nav.Link>
-                 <Nav.Link onClick={() => handleNavigate('/daily-menus')}>Menu</Nav.Link>
+                <Nav.Link onClick={() => handleNavigate('/daily-menus')}>Menu</Nav.Link>
                 {/* <Nav.Link onClick={() => handleNavigate('/update_medical_info')}>Medical Info</Nav.Link> */}
               </>
             )}

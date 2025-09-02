@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
 import api from '../../services/api';
+import { getRole } from '../../services/tokenUtils';
 
 function MenuForm({ selectedDate, existingMenu, refreshMenus }) {
   const [breakfast, setBreakfast] = useState('');
   const [lunch, setLunch] = useState('');
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
+
+  const role = getRole();
+  const isReadOnly = role === 'parent' || role === 'teacher';
 
   useEffect(() => {
     if (existingMenu) {
@@ -22,9 +26,8 @@ function MenuForm({ selectedDate, existingMenu, refreshMenus }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!selectedDate) {
-      setError('Δεν έχει επιλεγεί ημερομηνία.');
+      setError('No date selected.');
       return;
     }
 
@@ -37,10 +40,10 @@ function MenuForm({ selectedDate, existingMenu, refreshMenus }) {
     try {
       if (existingMenu) {
         await api.put(`/daily-menus/${existingMenu.id}/`, payload);
-        setMessage('The menu was successfully updated.');
+        setMessage('Successfully updated.');
       } else {
         await api.post('/daily-menus/', payload);
-        setMessage('The menu was successfully added.');
+        setMessage('Successfully added.');
       }
       refreshMenus();
     } catch (err) {
@@ -51,13 +54,12 @@ function MenuForm({ selectedDate, existingMenu, refreshMenus }) {
 
   const handleDelete = async () => {
     if (!existingMenu) return;
-
     const confirmDelete = window.confirm('Are you sure you want to delete the menu?');
     if (!confirmDelete) return;
 
     try {
       await api.delete(`/daily-menus/${existingMenu.id}/`);
-      setMessage('The menu was successfully deleted.');
+      setMessage('Successfully deleted.');
       setBreakfast('');
       setLunch('');
       refreshMenus();
@@ -70,7 +72,7 @@ function MenuForm({ selectedDate, existingMenu, refreshMenus }) {
   return (
     <Card>
       <Card.Body>
-        <Card.Title>{existingMenu ? 'Edit Menu' : 'Add Menu'}</Card.Title>
+        <Card.Title>{existingMenu ? 'View Menu' : 'Add Menu'}</Card.Title>
 
         {message && <Alert variant="success">{message}</Alert>}
         {error && <Alert variant="danger">{error}</Alert>}
@@ -85,24 +87,32 @@ function MenuForm({ selectedDate, existingMenu, refreshMenus }) {
             />
           </Form.Group>
 
-        
-
           <Form.Group className="mb-3">
             <Form.Label>Lunch</Form.Label>
             <Form.Control
               type="text"
               value={lunch}
+              disabled={isReadOnly}
               onChange={(e) => setLunch(e.target.value)}
-              placeholder="e.g. Pasta with meat"
+              placeholder="ex. Spaghetti Bolognese"
             />
           </Form.Group>
 
-          <Button variant="primary" type="submit">Save</Button>
+          {!isReadOnly && (
+            <>
+              <Button variant="primary" type="submit">Αποθήκευση</Button>
+              {existingMenu && (
+                <Button variant="danger" onClick={handleDelete} className="ms-2">
+                  Delete
+                </Button>
+              )}
+            </>
+          )}
 
-          {existingMenu && (
-            <Button variant="danger" onClick={handleDelete} className="ms-2">
-              Delete
-            </Button>
+          {isReadOnly && (
+            <Alert variant="info" className="mt-3">
+              Unauthorized.
+            </Alert>
           )}
         </Form>
       </Card.Body>
