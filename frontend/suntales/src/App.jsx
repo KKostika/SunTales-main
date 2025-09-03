@@ -20,6 +20,7 @@ import WeeklyMenuCalendar from './components/Menu/menuCalendar.jsx'
 import Meals from './components/Menu/Meals.jsx';
 import FinancialRecords from './components/Managment/Invoices.jsx';
 import ActivitiesPage from './components/Activities/activitiesPage.jsx';
+import Activities from './components/LandingPage/activitiesInfo.jsx';
 
 
 
@@ -30,6 +31,7 @@ function HomePage() {
     <>
       <Landing />
       <About />
+      <Activities />
       <Teachers />
       <Contact />
     </>
@@ -101,7 +103,7 @@ function App() {
             <Route
               path="/meals"
               element={
-                <ProtectedRoute allowedRoles={['admin', 'parent']}>
+                <ProtectedRoute allowedRoles={['admin', 'parent', 'teacher']}>
                   <Meals />
                 </ProtectedRoute>
               }

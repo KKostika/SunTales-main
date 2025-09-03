@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import Carousel from 'react-bootstrap/Carousel';
 import duckInClass from '../../assets/images/ducksinClass.jpg';
 import Adventure from '../../assets/images/Adventures.jpg';
-import Yummy from '../../assets/images/Yummy.jpg';
-import financial from '../../assets/images/financial.jpg';
+import Contact from '../../assets/images/contactInfo.jpg';
+import Heroes from '../../assets/images/ourHeroes.jpg';
 
 
 
@@ -20,22 +20,22 @@ var heroData = [
     title: "Tiny Feet, Big Adventures",
     description: "Discover upcoming events, joyful excursions, and daily classroom moments.",
     image: Adventure,
-    link:"/activites"
+    link:"#activities"
 },
 {
     id: 3,
-    title: "Quack & Snack",
-    description: "Explore this week’s nutritious menu and stay informed on your child’s daily eating",
-    image: Yummy,
-    link:'#meals'
+    title: "Your Line to Little Wonders",
+    description: "Contact us to discover how we can support your child’s journey with answers, smiles, and playful professionalism.",
+    image: Contact,
+    link:'#contact'
 },
-// {
-//     id: 4,
-//     title: "Financial Overview",
-//     description: "Clear insights into tuition schedules, upcoming payments, and essential budget allocations for your child’s learning journey",
-//     image: financial,
-//     link:"/financial"
-// }
+{
+    id: 4,
+    title: "Our Heroes",
+    description: "Meet the everyday heroes who guide, inspire, and celebrate every little victory in our kindergarten world",
+    image: Heroes,
+    link:"#teachers"
+}
 ]
 
 function Landing() {
