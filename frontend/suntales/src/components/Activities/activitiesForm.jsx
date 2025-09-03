@@ -208,7 +208,7 @@ function ActivitiesForm() {
           disabled={uploading || !name || !date || !classId}
           style={{ textTransform: 'none' }}
         >
-          {uploading ? <Spinner animation="border" size="sm" /> : 'Ανέβασμα'}
+          {uploading ? <Spinner animation="border" size="sm" /> : 'Upload'}
         </Button>
       </Form>
     </div>

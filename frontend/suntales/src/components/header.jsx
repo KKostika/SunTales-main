@@ -75,8 +75,9 @@ function Header() {
                 <Nav.Link onClick={() => handleNavigate('/dashboard')}>Dashboard</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/students')}>Students</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/activities')}>Activities</Nav.Link>
+                <Nav.Link onClick={() => handleNavigate('/meals')}>Meals</Nav.Link>
                 {/* <Nav.Link onClick={() => handleNavigate('/messages')}>Messages</Nav.Link> */}
-                <Nav.Link onClick={() => handleNavigate('/classrooms')}>Classrooms</Nav.Link>
+                {/* <Nav.Link onClick={() => handleNavigate('/classrooms')}>Classrooms</Nav.Link> */}
               </>
             )}
 
@@ -87,6 +88,7 @@ function Header() {
                 <Nav.Link onClick={() => handleNavigate('/activities')}>Activities</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/students')}>Students</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/financial_records')}>Invoices</Nav.Link>
+                <Nav.Link onClick={() => handleNavigate('/meals')}>Meals</Nav.Link>
                 <Nav.Link onClick={() => handleNavigate('/daily-menus')}>Menu</Nav.Link>
                 {/* <Nav.Link onClick={() => handleNavigate('/update_medical_info')}>Medical Info</Nav.Link> */}
               </>

@@ -62,6 +62,49 @@ class MealsSerializer(serializers.ModelSerializer):
         model = Meals
         fields = '__all__'
 
+
+class SimpleTeacherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Teacher
+        fields = ['id', 'name']
+
+
+class ClassroomSerializer(serializers.ModelSerializer):
+    students = serializers.SerializerMethodField()
+    teacher = SimpleTeacherSerializer(read_only=True)
+
+    class Meta:
+        model = Classroom
+        fields = ['id', 'name', 'teacher', 'students']
+
+    def get_students(self, obj):
+        user = self.context['request'].user
+        role = getattr(user, 'role', None)
+
+        if role == 'parent':
+            try:
+                parent = Parent.objects.get(user=user)
+                students = obj.students.filter(parents=parent)
+            except Parent.DoesNotExist:
+                students = Student.objects.none()
+        elif role == 'teacher':
+            try:
+                teacher = Teacher.objects.get(user=user)
+                students = obj.students.filter(teacher=teacher)
+            except Teacher.DoesNotExist:
+                students = Student.objects.none()
+        else:
+            students = obj.students.all()
+
+        return [
+            {
+                'id': student.id,
+                'name': student.name,
+                'age': student.age,
+            }
+            for student in students
+        ]
+
 class TeacherSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(role='teacher')
@@ -69,7 +112,7 @@ class TeacherSerializer(serializers.ModelSerializer):
     name = serializers.CharField(read_only=True)
     phone = serializers.SerializerMethodField()
     activities = serializers.SerializerMethodField()
-    classrooms = serializers.SerializerMethodField()  # read-only list of dicts
+    classrooms = ClassroomSerializer(many=True, read_only=True)
     classroom_ids = serializers.PrimaryKeyRelatedField(
         source='classrooms',
         many=True,
@@ -85,8 +128,6 @@ class TeacherSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['name']
 
-    def get_classrooms(self, obj):
-        return [{'id': c.id, 'name': c.name} for c in obj.classrooms.all()]
 
     def get_phone(self, obj):
         return obj.user.phone
@@ -110,39 +151,7 @@ class TeacherSerializer(serializers.ModelSerializer):
 
 
 
-class ClassroomSerializer(serializers.ModelSerializer):
-    students = serializers.SerializerMethodField()
-    teacher = TeacherSerializer(read_only=True)
 
-    class Meta:
-        model = Classroom
-        fields = ['id', 'name', 'teacher', 'students']
-
-    def get_students(self, obj):
-        user = self.context['request'].user
-        role = getattr(user, 'role', None)
-
-        if role == 'parent':
-            try:
-                parent = Parent.objects.get(user=user)
-                students = obj.students.filter(parents=parent)
-            except Parent.DoesNotExist:
-                students = Student.objects.none()
-        elif role == 'teacher':
-            # Αν θες να περιορίσεις τους μαθητές μόνο σε αυτούς του δασκάλου
-            students = obj.students.filter(teacher__user=user)
-        else:
-            # Για admin ή άλλους ρόλους
-            students = obj.students.all()
-
-        return [
-            {
-                'id': student.id,
-                'name': student.name,
-                'age': student.age,
-            }
-            for student in students
-        ]
 
 
 class StudentSerializer(serializers.ModelSerializer):

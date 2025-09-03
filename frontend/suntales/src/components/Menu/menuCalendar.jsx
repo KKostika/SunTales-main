@@ -88,7 +88,7 @@ function WeeklyMenuCalendar() {
           ) : null}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>Κλείσιμο</Button>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>close</Button>
         </Modal.Footer>
       </Modal>
     </div>

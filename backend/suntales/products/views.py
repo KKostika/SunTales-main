@@ -185,6 +185,17 @@ class TeacherViewSet(viewsets.ModelViewSet):
         if classroom_id:
             qs = qs.filter(classrooms__id=classroom_id)
         return qs
+    
+    @action(detail=False, methods=['get'], url_path='by-user/(?P<user_id>[^/.]+)')
+    def get_by_user(self, request, user_id=None):
+        try:
+            teacher = Teacher.objects.get(user__id=user_id)
+            serializer = self.get_serializer(teacher)
+            return Response(serializer.data)
+        except Teacher.DoesNotExist:
+            return Response({'detail': 'Teacher not found.'}, status=404)
+    
+    
 
 
 class TeacherUsersView(APIView):
@@ -300,14 +311,23 @@ class MealsViewSet(viewsets.ModelViewSet):
     serializer_class = MealsSerializer
     permission_classes = [HasRolePermission]
     allowed_roles = ['admin', 'teacher', 'parent']
-    # filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['student', 'date']
 
     def get_queryset(self):
         user = self.request.user
 
-        if user.role in ['admin', 'teacher']:
+        if user.role == 'admin':
             return Meals.objects.all()
+
+        if user.role == 'teacher':
+            try:
+                teacher = Teacher.objects.get(user=user)
+                classrooms = teacher.classrooms.all()
+                students = Student.objects.filter(classroom__in=classrooms)
+                return Meals.objects.filter(student__in=students)
+            except Teacher.DoesNotExist:
+                return Meals.objects.none()
 
         if user.role == 'parent':
             try:
@@ -327,7 +347,7 @@ class DailyMenuViewSet(viewsets.ModelViewSet):
     queryset = DailyMenu.objects.all()
     serializer_class = DailyMenuSerializer
     permission_classes = [HasRolePermission]
-    allowed_roles = ['admin', 'parent']
+    allowed_roles = ['admin', 'parent', 'teacher']
 
 class MessagesViewSet(viewsets.ModelViewSet):
     queryset = Messages.objects.all()
@@ -359,9 +379,12 @@ class ActivitiesViewSet(viewsets.ModelViewSet):
             return Activities.objects.all()
 
         if role == 'teacher':
-            classroom = getattr(user, 'teacher_classroom', None)
-            if classroom:
-                return Activities.objects.filter(classroom=classroom)
+            try:
+                teacher = Teacher.objects.get(user=user)
+                return Activities.objects.filter(classroom__in=teacher.classrooms.all())
+            except Teacher.DoesNotExist:
+                return Activities.objects.none()
+
 
         if role == 'parent':
             try:
