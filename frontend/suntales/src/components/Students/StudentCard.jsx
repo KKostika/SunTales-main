@@ -117,8 +117,8 @@ const StudentCard = ({ student, role, currentUserId, onTrackMeal, onEdit }) => {
 
   return (
     <>
-      <Card className="shadow-sm mb-4">
-        <Card.Body>
+      <Card className="shadow-sm mb-4" >
+        <Card.Body >
           <Card.Title>{student.name ?? 'No Name'}</Card.Title>
           {userRole !== 'parent' && (
             <Button variant="warning" className="mt-2 me-2" onClick={() => onEdit(student)}>

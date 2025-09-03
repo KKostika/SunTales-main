@@ -15,7 +15,9 @@ from .views import (
     MeetingsViewSet,
     UpdateMedicalInfo,
     UserViewSet,
-    activities_by_classroom,
+    EventViewSet,
+    AnnouncementViewSet
+
 
    
 )
@@ -34,10 +36,12 @@ router.register(r'messages', MessagesViewSet)
 router.register(r'meetings', MeetingsViewSet)
 router.register(r'update_medical_info', UpdateMedicalInfo, basename='update_medical_info')
 router.register(r'users', UserViewSet)
+router.register(r'events', EventViewSet)
+router.register(r'announcements', AnnouncementViewSet)
+
 
 
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('activities/by-classroom/', activities_by_classroom, name='activities-by-classroom'),
 ]

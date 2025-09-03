@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status, filters
-from products.api.permissions import HasRolePermission, HasRoleAdminPermission
+from products.api.permissions import HasRolePermission, HasRoleAdminPermission, allowed_roles
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -30,6 +30,8 @@ from .models import (
     Messages, 
     Meetings,
     DailyMenu,
+    Event,
+    Announcement
     
 )
 
@@ -51,18 +53,9 @@ from .serializers import (
     MyTokenObtainPairSerializer,
     UserSerializer,
     ActivitiesPhotoSerializer,
+    EventSerializer,
+    AnnouncementSerializer
 )
-
-
-# Create your views here.
-
-
-# class StudentViewSet(viewsets.ModelViewSet):
-#     queryset = Student.objects.all()
-#     serializer_class = StudentSerializer
-#     permission_classes = [partial(HasRolePermission, roles=['admin', 'teacher'])]
-#     # def get_permissions(self):
-#     #     return [HasRolePermission(roles=['admin']), HasRolePermission(roles=['teacher'])]
 
 
 class StudentViewSet(viewsets.ModelViewSet):
@@ -81,7 +74,13 @@ class StudentViewSet(viewsets.ModelViewSet):
         if role == 'parent':
             return Student.objects.filter(parents__user=user)
         elif role == 'teacher':
-            return Student.objects.filter(classroom__teacher__user=user)
+            try:
+                teacher = Teacher.objects.get(user=user)
+            except Teacher.DoesNotExist:
+                return Student.objects.none()
+            return Student.objects.filter(
+                classroom__in=teacher.classrooms.all()
+            )
         elif role == 'admin':
             return Student.objects.all()
 
@@ -92,9 +91,20 @@ class StudentViewSet(viewsets.ModelViewSet):
         user = request.user
         role = getattr(user, 'role', None)
 
-        if role == 'parent' and not student.parents.filter(user=user).exists():
-            return Response({'error': 'Not allowed'}, status=status.HTTP_403_FORBIDDEN)
+        if role == 'parent':
+            if not student.parents.filter(user=user).exists():
+                return Response({'error': 'Not allowed'}, status=status.HTTP_403_FORBIDDEN)
 
+            # Περιορίζουμε τα πεδία που μπορεί να ενημερώσει ο γονέας
+            allowed_fields = ['allergies']
+            data = {field: request.data[field] for field in allowed_fields if field in request.data}
+
+            serializer = self.get_serializer(student, data=data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data)
+
+        # Για admin/teacher συνεχίζουμε κανονικά
         return super().update(request, *args, **kwargs)
 
     @action(detail=True, methods=['post'], url_path='meals')
@@ -117,7 +127,7 @@ class StudentViewSet(viewsets.ModelViewSet):
 
         return Response({'message': 'Meal tracked successfully'}, status=status.HTTP_201_CREATED)
 @api_view(['GET'])
-@permission_classes([HasRoleAdminPermission])
+@permission_classes([HasRolePermission])
 def teacher_list(request):
     teachers = Teacher.objects.select_related('user').all()
     data = [
@@ -131,42 +141,45 @@ def teacher_list(request):
     ]
     return Response(data)
 
-@api_view(['GET'])
-@permission_classes([HasRoleAdminPermission])
-def parent_list(request):
-    parents = Parent.objects.select_related('user').all()
-    data = [
-        {
-            'id': parent.id,
-            'name': parent.name,
-            'user_id': parent.user.id,
-            'username': parent.user.username
-        }
-        for parent in parents
-    ]
-    return Response(data)
 
+
+class ParentList(APIView):
+    """
+    Επιστρέφει λίστα όλων των Parent instances.
+    Ελέγχει authentication και role-based authorization.
+    """
+    permission_classes = [ HasRolePermission]
+    allowed_roles      = ['admin', 'teacher', 'parent']
+
+    def get(self, request):
+        # Φόρτωση γονέων με related user για efficiency
+        parents = Parent.objects.select_related('user').all()
+
+        # Σειριοποίηση σε JSON-φιλικά dicts
+        data = [
+            {
+                'id':       parent.id,
+                'name':     parent.name,
+                'user_id':  parent.user.id,
+                'username': parent.user.username
+            }
+            for parent in parents
+        ]
+
+        return Response(data)
 
 
 class TeacherViewSet(viewsets.ModelViewSet):
-    """
-    Επιστρέφει μόνο τους teachers που ανήκουν στο classroom
-    που δίνεται στο query param `classroom`.
-    """
     queryset = Teacher.objects.select_related('user') \
                               .prefetch_related('classrooms')
     serializer_class = TeacherSerializer
     permission_classes = [HasRolePermission]
     allowed_roles = ['admin', 'teacher']
 
-    filter_backends = [DjangoFilterBackend]
+    # filter_backends = [DjangoFilterBackend]
     filterset_fields = ['classrooms']
 
     def get_queryset(self):
-        """
-        Αντί για το default `?classrooms=…`, δέχεται `?classroom=…`
-        και φιλτράρει με βάση το id του classroom.
-        """
         qs = super().get_queryset()
         classroom_id = self.request.query_params.get('classroom')
         if classroom_id:
@@ -174,21 +187,23 @@ class TeacherViewSet(viewsets.ModelViewSet):
         return qs
 
 
-@api_view(['GET'])
-@permission_classes([HasRoleAdminPermission])
-def teacher_users(request):
-    User = get_user_model()
-    teachers = User.objects.filter(role='teacher')
-    data = [{'id': u.id, 'name': f"{u.first_name} {u.last_name}".strip()} for u in teachers]
-    return Response(data)
+class TeacherUsersView(APIView):
+    permission_classes = [HasRoleAdminPermission]
+    
+
+    def get(self, request):
+        User = get_user_model()
+        teachers = User.objects.filter(role='teacher')
+        data = [{'id': u.id, 'name': f"{u.first_name} {u.last_name}".strip()} for u in teachers]
+        return Response(data)
 
 
 class ParentViewSet(viewsets.ModelViewSet):
     queryset = Parent.objects.all()
     serializer_class = ParentSerializer
     permission_classes = [HasRolePermission]
-    allowed_roles = ['admin', 'parent']
-    filter_backends = [filters.SearchFilter]
+    allowed_roles = ['admin', 'parent', 'teacher']
+    # filter_backends = [filters.SearchFilter]
     search_fields = [
     'user__first_name',
     'user__last_name',
@@ -239,17 +254,22 @@ class ClassroomViewSet(viewsets.ModelViewSet):
             return Classroom.objects.all()
 
         if role == 'teacher':
-            teacher = getattr(user, 'teacher_profile', None)
-            if teacher:
+            try:
+                teacher = Teacher.objects.get(user=user)
                 return teacher.classrooms.all()
+            except Teacher.DoesNotExist:
+                return Classroom.objects.none()
 
         if role == 'parent':
-            children = getattr(user, 'children', None)
-            if children:
-                classroom_ids = children.values_list('classroom_id', flat=True)
-                return Classroom.objects.filter(id__in=classroom_ids)
+            try:
+                parent = Parent.objects.get(user=user)
+                student_classroom_ids = parent.students.values_list('classroom_id', flat=True)
+                return Classroom.objects.filter(id__in=student_classroom_ids)
+            except Parent.DoesNotExist:
+                return Classroom.objects.none()
 
         return Classroom.objects.none()
+
 
 class FinancialRecordViewSet(viewsets.ModelViewSet):
     queryset = FinancialRecord.objects.all()
@@ -259,6 +279,7 @@ class FinancialRecordViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        print(f"User: {user}, Role: {user.role}")
 
         if user.role == 'admin':
             return FinancialRecord.objects.all()
@@ -279,7 +300,7 @@ class MealsViewSet(viewsets.ModelViewSet):
     serializer_class = MealsSerializer
     permission_classes = [HasRolePermission]
     allowed_roles = ['admin', 'teacher', 'parent']
-    filter_backends = [DjangoFilterBackend]
+    # filter_backends = [DjangoFilterBackend]
     filterset_fields = ['student', 'date']
 
     def get_queryset(self):
@@ -318,8 +339,8 @@ class MessagesViewSet(viewsets.ModelViewSet):
 class ActivitiesPhotoViewSet(viewsets.ModelViewSet):
     queryset = ActivitiesPhoto.objects.all()
     serializer_class = ActivitiesPhotoSerializer
-    permission_classes = [HasRoleAdminPermission]
-    allowed_roles = ['admin', 'teacher']
+    permission_classes = [HasRolePermission]
+    allowed_roles = ['admin', 'teacher', 'parent']
 
     
 
@@ -332,61 +353,26 @@ class ActivitiesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-       
-        if user.is_staff or getattr(user, 'role', None) == 'admin':
+        role = getattr(user, 'role', None)
+
+        if user.is_staff or role == 'admin':
             return Activities.objects.all()
 
-        if getattr(user, 'role', None) == 'teacher':
+        if role == 'teacher':
             classroom = getattr(user, 'teacher_classroom', None)
             if classroom:
                 return Activities.objects.filter(classroom=classroom)
 
-        if getattr(user, 'role', None) == 'parent':
-            children = getattr(user, 'children', None)
-            if children:
-                classrooms = children.values_list('classroom', flat=True)
-                return Activities.objects.filter(classroom__in=classrooms)
+        if role == 'parent':
+            try:
+                parent = Parent.objects.get(user=user)
+                students = parent.students.all()
+                classroom_ids = students.values_list('classroom_id', flat=True)
+                return Activities.objects.filter(classroom__in=classroom_ids)
+            except Parent.DoesNotExist:
+                return Activities.objects.none()
 
         return Activities.objects.none()
-    
-@api_view(['GET'])
-@permission_classes([HasRolePermission])
-def activities_by_classroom(request):
-    user = request.user
-    role = getattr(user, 'role', None)
-
-    if role == 'admin' or user.is_staff:
-        classrooms = Classroom.objects.all()
-    elif role == 'teacher':
-        teacher = getattr(user, 'teacher_profile', None)
-        classrooms = teacher.classrooms.all() if teacher else Classroom.objects.none()
-    elif role == 'parent':
-        children = getattr(user, 'children', None)
-        classroom_ids = children.values_list('classroom_id', flat=True) if children else []
-        classrooms = Classroom.objects.filter(id__in=classroom_ids)
-    else:
-        classrooms = Classroom.objects.none()
-
-    data = []
-    for classroom in classrooms:
-        activities = Activities.objects.filter(classroom=classroom)
-        data.append({
-            'classroom': {
-                'id': classroom.id,
-                'name': classroom.name
-            },
-            'activities': [
-                {
-                    'id': activity.id,
-                    'title': activity.title,
-                    'description': activity.description,
-                    'date': activity.date
-                }
-                for activity in activities
-            ]
-        })
-
-    return Response(data)
 
 
 
@@ -399,7 +385,9 @@ class MeetingsViewSet(viewsets.ModelViewSet):
 
 
 class UpdateMedicalInfo(viewsets.ModelViewSet):
-    permission_classes = [CanEditMedicalInfo]
+    permission_classes = [HasRolePermission]
+    allowed_roles = ['admin', 'parent']
+    queryset = MedicalInfo.objects.all()
     serializer_class = MedicalInfoSerializer
 
     def get_queryset(self):
@@ -428,6 +416,15 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
-   
 
+class EventViewSet(viewsets.ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [HasRolePermission]
+    allowed_roles = ['admin', 'parent', 'teacher'] 
 
+class AnnouncementViewSet(viewsets.ModelViewSet):
+    queryset = Announcement.objects.all()
+    serializer_class = AnnouncementSerializer
+    permission_classes = [HasRolePermission]
+    allowed_roles = ['admin', 'parent', 'teacher'] 

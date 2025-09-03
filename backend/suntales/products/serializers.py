@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Activities, Classroom, FinancialRecord, Meals, Meetings, Messages, Parent, Student, Teacher, MedicalInfo, DailyMenu, ActivitiesPhoto
+from .models import Activities, Announcement, Classroom, FinancialRecord, Meals, Meetings, Messages, Parent, Student, Teacher, MedicalInfo, DailyMenu, ActivitiesPhoto, Event, Announcement
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
 
@@ -123,26 +123,34 @@ class ClassroomSerializer(serializers.ModelSerializer):
         role = getattr(user, 'role', None)
 
         if role == 'parent':
-            children_ids = user.children.values_list('id', flat=True)
-            students = obj.students.filter(id__in=children_ids)
+            try:
+                parent = Parent.objects.get(user=user)
+                students = obj.students.filter(parents=parent)
+            except Parent.DoesNotExist:
+                students = Student.objects.none()
+        elif role == 'teacher':
+            # Αν θες να περιορίσεις τους μαθητές μόνο σε αυτούς του δασκάλου
+            students = obj.students.filter(teacher__user=user)
         else:
+            # Για admin ή άλλους ρόλους
             students = obj.students.all()
 
         return [
             {
                 'id': student.id,
-                'name': f"{student.name} ".strip(),
+                'name': student.name,
                 'age': student.age,
-                
             }
             for student in students
         ]
+
 
 class StudentSerializer(serializers.ModelSerializer):
     parents = serializers.PrimaryKeyRelatedField(queryset=Parent.objects.all(), many=True)
     parent_details = serializers.SerializerMethodField()
     meals = MealsSerializer(many=True, read_only=True)
     teacher_details = serializers.SerializerMethodField()
+    classroom_id = serializers.PrimaryKeyRelatedField(source='classroom', queryset=Classroom.objects.all())
     classroom = ClassroomSerializer(read_only=True)
 
 
@@ -155,6 +163,7 @@ class StudentSerializer(serializers.ModelSerializer):
             'enrollment_date',
             'teacher',
             'teacher_details',
+            'classroom_id',
             'classroom',
             'parents',
             'parent_details',
@@ -177,15 +186,11 @@ class StudentSerializer(serializers.ModelSerializer):
                 'id': parent.id,
                 'name': parent.name,
                 'phone': parent.phone,
+                'user_id': parent.user.id,  
                 'user': UserSerializer(parent.user).data  
             }
             for parent in obj.parents.all()
         ]
-
-
-
-
-
 
 
 
@@ -198,8 +203,15 @@ class FinancialRecordSerializer(serializers.ModelSerializer):
         fields = ['id', 'student', 'student_name', 'parent_name', 'amount', 'date', 'description', 'status']
 
     def get_parent_name(self, obj):
-        parent = obj.student.parents.first()
-        return parent.name if parent else '—'
+        try:
+            parent = obj.student.parents.first()
+            if parent and parent.user:
+                return f"{parent.user.first_name} {parent.user.last_name}".strip()
+            return '—'
+        except Exception:
+            return '—'
+
+
 
 
 
@@ -346,9 +358,6 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-    
-
-
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -370,3 +379,15 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['role'] = self.user.role if hasattr(self.user, 'role') else 'user'
 
         return data
+    
+
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = '__all__'
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = '__all__'
+

@@ -19,7 +19,7 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
 from suntales.config import settings
 from django.conf.urls.static import static
-from suntales.products.views import MyTokenObtainPairView, parent_users, teacher_users, teacher_list, parent_list
+from suntales.products.views import MyTokenObtainPairView, parent_users, TeacherUsersView, teacher_list, ParentList
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,9 +27,10 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api/parent-users/', parent_users, name='parent-users'),
     path('api/parent-users/<int:pk>/', parent_users, name='parent-user-detail'),
-    path('api/teacher-users/', teacher_users, name='teacher-users'),
+    path('api/teacher-users/', TeacherUsersView.as_view(), name='teacher-users'),
     path('api/teacher-list/', teacher_list, name='teacher-list'),
-    path('api/parent-list/', parent_list, name='parent-list'),
+    path('api/parent-list/', ParentList.as_view(), name='parent-list'),
+
 
 
     # JWT Authentication URLs. These URLs are used for obtaining and refreshing JWT tokens
@@ -41,4 +42,3 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

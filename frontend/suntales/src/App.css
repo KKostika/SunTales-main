@@ -136,7 +136,6 @@ ul,
   font-size: 14px;
   line-height: 18px;
   font-weight: 600;
-  text-transform: uppercase;
   transition: background 0.3s linear, color 0.3s linear;
   -webkit-transition: background 0.3s linear, color 0.3s linear;
 }

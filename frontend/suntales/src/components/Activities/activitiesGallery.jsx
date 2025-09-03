@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Button, Form, Modal } from 'react-bootstrap';
+import { Card, Row, Col, Button, Form } from 'react-bootstrap';
 import api from '../../services/api';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { getRole } from '../../services/tokenUtils';
 
-function ActivitiesGallery({ studentClassId }) {
+function ActivitiesGallery() {
   const [activities, setActivities] = useState([]);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -15,7 +15,6 @@ function ActivitiesGallery({ studentClassId }) {
   const [editedDate, setEditedDate] = useState('');
   const [editedClassId, setEditedClassId] = useState('');
   const [classrooms, setClassrooms] = useState([]);
-
   const [selectedActivity, setSelectedActivity] = useState(null);
 
   const userRole = getRole();
@@ -25,12 +24,7 @@ function ActivitiesGallery({ studentClassId }) {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const endpoint =
-          canDelete || !studentClassId
-            ? '/activities/'
-            : `/activities/?classroom=${studentClassId}`;
-        const res = await api.get(endpoint);
-
+        const res = await api.get('/activities/');
         const sortedActivities = res.data.sort((a, b) => new Date(b.date) - new Date(a.date));
         setActivities(sortedActivities);
       } catch (err) {
@@ -48,11 +42,9 @@ function ActivitiesGallery({ studentClassId }) {
       }
     };
 
-
-
     fetchActivities();
     fetchClassrooms();
-  }, [studentClassId, canDelete]);
+  }, []);
 
   const openAlbum = (activity) => {
     const slides = activity.photos.map(p => ({
@@ -81,7 +73,6 @@ function ActivitiesGallery({ studentClassId }) {
     setEditedClassId(activity.classroom?.id || '');
   };
 
-
   const saveActivity = async (activityId) => {
     try {
       await api.patch(`/activities/${activityId}/`, {
@@ -104,13 +95,12 @@ function ActivitiesGallery({ studentClassId }) {
       setEditedClassId('');
     } catch (err) {
       console.error('Failed to update activity:', err);
-      alert('Η ενημέρωση απέτυχε.');
+      alert('Failed to update activity.');
     }
   };
 
-
   const deleteActivity = async (activityId) => {
-    const confirm = window.confirm('Are you sure you want to delete the activity?');
+    const confirm = window.confirm('Are you sure you want to delete this activity?');
     if (!confirm) return;
 
     try {
@@ -118,14 +108,14 @@ function ActivitiesGallery({ studentClassId }) {
       setActivities(prev => prev.filter(a => a.id !== activityId));
     } catch (err) {
       console.error('Delete activity failed:', err);
-      alert('Delete activity failed.');
+      alert('Failed to delete activity.');
     }
   };
 
   return (
     <div className="container mt-4">
       {activities.length === 0 ? (
-        <p>No activities for display.</p>
+        <p>No available activities.</p>
       ) : (
         <Row>
           {activities.map(activity => (
@@ -145,7 +135,7 @@ function ActivitiesGallery({ studentClassId }) {
                   {editingActivityId === activity.id ? (
                     <Form>
                       <Form.Group className="mb-2">
-                        <Form.Label>Όνομα</Form.Label>
+                        <Form.Label>Name</Form.Label>
                         <Form.Control
                           type="text"
                           value={editedName}
@@ -154,7 +144,7 @@ function ActivitiesGallery({ studentClassId }) {
                       </Form.Group>
 
                       <Form.Group className="mb-2">
-                        <Form.Label>Ημερομηνία</Form.Label>
+                        <Form.Label>Date</Form.Label>
                         <Form.Control
                           type="date"
                           value={editedDate}
@@ -163,12 +153,12 @@ function ActivitiesGallery({ studentClassId }) {
                       </Form.Group>
 
                       <Form.Group className="mb-2">
-                        <Form.Label>Τάξη</Form.Label>
+                        <Form.Label>Classroom</Form.Label>
                         <Form.Select
                           value={editedClassId}
                           onChange={(e) => setEditedClassId(e.target.value)}
                         >
-                          <option value="">-- Επιλέξτε Τάξη --</option>
+                          <option value="">-- Select Classroom --</option>
                           {classrooms.map(c => (
                             <option key={c.id} value={c.id}>{c.name}</option>
                           ))}
@@ -176,7 +166,7 @@ function ActivitiesGallery({ studentClassId }) {
                       </Form.Group>
 
                       <Button variant="outline-success" size="sm" onClick={() => saveActivity(activity.id)}>
-                        Αποθήκευση
+                        Save
                       </Button>
                     </Form>
                   ) : (
@@ -194,9 +184,9 @@ function ActivitiesGallery({ studentClassId }) {
                           </Button>
                         )}
                       </Card.Title>
-                      <Card.Text className="text-muted">Ημερομηνία: {activity.date}</Card.Text>
-                      <Card.Text>Φωτογραφίες: {activity.photos.length}</Card.Text>
-                      <Card.Text>Classroom {activity.classroom?.name || 'Άγνωστη'}</Card.Text>
+                      <Card.Text className="text-muted">Date: {activity.date}</Card.Text>
+                      <Card.Text>Photos: {activity.photos.length}</Card.Text>
+                      <Card.Text>Classroom: {activity.classroom?.name || 'Unknown'}</Card.Text>
                     </>
                   )}
 
@@ -206,13 +196,12 @@ function ActivitiesGallery({ studentClassId }) {
                       size="sm"
                       className="text-danger p-0"
                       onClick={() => deleteActivity(activity.id)}
-                      title="Διαγραφή Δραστηριότητας"
+                      title="Delete Activity"
                     >
                       🗑️
                     </Button>
                   )}
                 </Card.Body>
-
               </Card>
             </Col>
           ))}
@@ -233,8 +222,3 @@ function ActivitiesGallery({ studentClassId }) {
 }
 
 export default ActivitiesGallery;
-
-
-
-
-

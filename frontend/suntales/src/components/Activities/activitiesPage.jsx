@@ -29,7 +29,7 @@ function ActivitiesPage() {
         </>
       )}
 
-      
+
       <ActivitiesGallery />
     </Container>
   );

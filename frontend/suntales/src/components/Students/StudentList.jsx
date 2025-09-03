@@ -252,11 +252,11 @@ useEffect(() => {
       <h2 className="mb-4 text-center">Student List</h2>
       
       {userRole !== 'parent' && (
-      <Row className="mb-3 justify-content-between align-items-center" >\
+      <Row className="mb-3 justify-content-between align-items-center" >
         <Col md={4}>
-          <Button className="mb-3" onClick={() => {
+          <Button className="mt-2"  onClick={() => {
             setFormData({ id: '', name: '', age: '', classroom: '', teacher: '', parentId: '' });
-            setSelectedStudent(null); // αν χρησιμοποιείς αυτό
+            setSelectedStudent(null); 
             setShowModal(true);
           }}>
             Add Student
@@ -312,7 +312,7 @@ useEffect(() => {
         </Row>
       )}
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>{formData.id ? 'Edit Student' : 'Add Student'}</Modal.Title>
         </Modal.Header>

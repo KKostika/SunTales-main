@@ -125,7 +125,7 @@ function App() {
               <Route
               path="/activities"
               element={
-                <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+                <ProtectedRoute allowedRoles={['admin', 'teacher', 'parent']}>
                   <ActivitiesPage />
                 </ProtectedRoute>
               }

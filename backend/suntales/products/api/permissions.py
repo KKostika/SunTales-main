@@ -18,13 +18,32 @@ class HasRolePermission(BasePermission):
     def __init__(self, roles=None):
         self.roles = roles if isinstance(roles, list) else [roles]
 
+    # def has_permission(self, request, view):
+    #     if request.method == 'OPTIONS':
+    #         return True
+    #     user_role = getattr(request.user, 'role', None)
+    #     allowed_roles = getattr(view, 'allowed_roles', [])
+    #     logger.warning(f"Checking permission: user={request.user}, role={user_role}, allowed_roles={allowed_roles}")
+    #     return request.user.is_authenticated and user_role in allowed_roles
+
     def has_permission(self, request, view):
         if request.method == 'OPTIONS':
             return True
+
         user_role = getattr(request.user, 'role', None)
         allowed_roles = getattr(view, 'allowed_roles', [])
+
         logger.warning(f"Checking permission: user={request.user}, role={user_role}, allowed_roles={allowed_roles}")
-        return request.user.is_authenticated and user_role in allowed_roles
+
+        # ✅ GET/HEAD/OPTIONS: επιτρέπεται σε όλους τους allowed_roles
+        if request.method in ['GET', 'HEAD']:
+                return request.user.is_authenticated and user_role in allowed_roles
+
+        # ✅ POST/PUT/PATCH/DELETE: επιτρέπεται μόνο σε admin & teacher
+        if request.method in ['POST', 'PUT', 'PATCH', 'DELETE']:
+            return request.user.is_authenticated and user_role in ['admin', 'teacher']
+
+        return False
 
 
 
