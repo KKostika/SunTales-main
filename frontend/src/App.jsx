@@ -1,11 +1,11 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import Header from './components/header';
-import About from './components/LandingPage/about';
+import Header from './components/header.jsx';
+import About from './components/LandingPage/about.jsx';
 import Teachers from './components/LandingPage/ourTeachers.jsx';
 import Contact from './components/LandingPage/contact.jsx';
-import Footer from './components/footer';
-import Login from './components/LoginPage';
+import Footer from './components/footer.jsx';
+import Login from './components/LoginPage.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Landing from './components/LandingPage/landingPage.jsx';
 import ProtectedRoute from './services/protectedRoutes.jsx';
@@ -14,7 +14,7 @@ import UserManagement from './components/Managment/UserManagments.jsx';
 import StudentList from './components/Students/StudentList.jsx';
 import ParentList from './components/Managment/ParentList.jsx';
 import TeachersList from './components/Managment/TeacherList.jsx';
-import api from './services/api';
+import api from './services/api.jsx';
 import AddClassroomForm from './components/Managment/classroomList.jsx';
 import WeeklyMenuCalendar from './components/Menu/menuCalendar.jsx'
 import Meals from './components/Menu/Meals.jsx';
