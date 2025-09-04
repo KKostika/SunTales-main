@@ -32,14 +32,14 @@ function UserManagement() {
   const errors = {};
   const { username, email, role, first_name, last_name, password, phone } = formData;
 
-  if (!username) errors.username = 'Υποχρεωτικό πεδίο';
-  if (!email) errors.email = 'Υποχρεωτικό πεδίο';
-  else if (!isValidEmail(email)) errors.email = 'Μη έγκυρο email';
-  if (!role) errors.role = 'Υποχρεωτικό πεδίο';
-  if (!first_name) errors.first_name = 'Υποχρεωτικό πεδίο';
-  if (!last_name) errors.last_name = 'Υποχρεωτικό πεδίο';
-  if (!editingUserId && !password) errors.password = 'Υποχρεωτικό πεδίο';
-  if (phone && phone.length < 10) errors.phone = 'Ο αριθμός τηλεφώνου πρέπει να έχει τουλάχιστον 10 ψηφία';
+  if (!username) errors.username = 'Required';
+  if (!email) errors.email = 'Required';
+  else if (!isValidEmail(email)) errors.email = 'Invalid email';
+  if (!role) errors.role = 'Required';
+  if (!first_name) errors.first_name = 'Required';
+  if (!last_name) errors.last_name = 'Required';
+  if (!editingUserId && !password) errors.password = 'Required';
+  if (phone && phone.length < 10) errors.phone = 'Phone number must be at least 10 digits';
 
   setFormErrors(errors);
   return Object.keys(errors).length === 0;
@@ -145,7 +145,7 @@ function UserManagement() {
       <div className="d-flex justify-content-between mb-3">
         <Form.Control
           type="text"
-          placeholder="Αναζήτηση με όνομα, email ή username"
+          placeholder="Search by name, email or username"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{ width: '60%' }}
@@ -155,14 +155,14 @@ function UserManagement() {
           onChange={(e) => setRoleFilter(e.target.value)}
           style={{ width: '35%' }}
         >
-          <option value="">Όλοι οι ρόλοι</option>
+          <option value="">All Roles</option>
           <option value="admin">Admin</option>
           <option value="teacher">Teacher</option>
           <option value="parent">Parent</option>
         </Form.Select>
       </div>
 
-      <Table striped bordered hover>
+      <Table striped bordered >
         <thead>
           <tr>
             <th>Firstname</th>
@@ -192,11 +192,11 @@ function UserManagement() {
         </tbody>
       </Table>
 
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Modal show={showModal} centered onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>{editingUserId ? 'Edit User' : 'Add User'}</Modal.Title>
+          <Modal.Title centered>{editingUserId ? 'Edit User' : 'Add User'}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body centered>
           <Form>
             {['first_name', 'last_name', 'username', 'password', 'email'].map(field => (
               <Form.Group className="mb-3" key={field}>

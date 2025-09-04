@@ -100,7 +100,7 @@ function MenuForm({ selectedDate, existingMenu, refreshMenus }) {
 
           {!isReadOnly && (
             <>
-              <Button variant="primary" type="submit">Αποθήκευση</Button>
+              <Button variant="primary" type="submit">Save</Button>
               {existingMenu && (
                 <Button variant="danger" onClick={handleDelete} className="ms-2">
                   Delete

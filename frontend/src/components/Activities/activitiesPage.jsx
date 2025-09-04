@@ -12,7 +12,7 @@ function ActivitiesPage() {
 
   return (
     <Container className="mt-4">
-      <h2>Δραστηριότητες</h2>
+      <h2>Activities</h2>
 
       {(userRole === 'admin' || userRole === 'teacher') && (
         <>

@@ -89,7 +89,7 @@ function ParentList() {
          Add Parent
       </Button>
 
-      <Table striped bordered hover>
+      <Table striped bordered >
         <thead>
           <tr>
             <th>Name</th>
@@ -116,7 +116,7 @@ function ParentList() {
       </Table>
 
       {/* Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} centered onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>{editingParent ? 'Edit Parent' : 'Add New Parent'}</Modal.Title>
         </Modal.Header>

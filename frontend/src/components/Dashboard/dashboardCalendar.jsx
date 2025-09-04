@@ -38,7 +38,7 @@ const DashboardCalendar = ({ role }) => {
     if (role !== 'admin') return; // 🔒 Μόνο admin μπορεί να προσθέσει
 
     if (!newEvent.date || !newEvent.title) {
-      setFormError('Παρακαλώ συμπληρώστε τουλάχιστον ημερομηνία και τίτλο.');
+      setFormError('Please fill in at least date and title.');
       return;
     }
 
@@ -57,12 +57,12 @@ const DashboardCalendar = ({ role }) => {
       })
       .catch(err => {
         console.error('Error adding event:', err);
-        setFormError('Παρουσιάστηκε σφάλμα κατά την αποθήκευση.');
+        setFormError('Error adding event.');
       });
   };
 
   const handleDeleteEvent = (id) => {
-    if (role !== 'admin') return; // 🔒 Μόνο admin μπορεί να διαγράψει
+    if (role !== 'admin') return; // only admin can delete
 
     api.delete(`/events/${id}/`)
       .then(() => {
@@ -79,7 +79,7 @@ const DashboardCalendar = ({ role }) => {
   };
 
   const handleDateClick = (info) => {
-    if (role !== 'admin') return; // 🔒 Μόνο admin μπορεί να ανοίξει modal προσθήκης
+    if (role !== 'admin') return; // 🔒 Only admin can open add modal
     setNewEvent({ ...newEvent, date: info.dateStr });
     setFormError('');
     setShowEventModal(true);
@@ -87,7 +87,7 @@ const DashboardCalendar = ({ role }) => {
 
   return (
     <section id="events" className="mt-5">
-      <h4 className="mb-3 text-center">📅 Ημερολόγιο Εκδηλώσεων</h4>
+      <h4 className="mb-3 text-center"> Event Calendar</h4>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
@@ -107,7 +107,7 @@ const DashboardCalendar = ({ role }) => {
           setFormError('');
         }} centered>
           <Modal.Header closeButton>
-            <Modal.Title>Προσθήκη Εκδήλωσης</Modal.Title>
+            <Modal.Title>Add Event</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             {formError && (
@@ -117,7 +117,7 @@ const DashboardCalendar = ({ role }) => {
             )}
             <Form>
               <Form.Group className="mb-3">
-                <Form.Label>Τίτλος</Form.Label>
+                <Form.Label>Title</Form.Label>
                 <Form.Control
                   type="text"
                   value={newEvent.title}
@@ -125,7 +125,7 @@ const DashboardCalendar = ({ role }) => {
                 />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Ώρα</Form.Label>
+                <Form.Label>Time</Form.Label>
                 <Form.Control
                   type="time"
                   value={newEvent.time}
@@ -133,7 +133,7 @@ const DashboardCalendar = ({ role }) => {
                 />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Περιγραφή</Form.Label>
+                <Form.Label>Description</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
@@ -147,8 +147,8 @@ const DashboardCalendar = ({ role }) => {
             <Button variant="secondary" onClick={() => {
               setShowEventModal(false);
               setFormError('');
-            }}>Άκυρο</Button>
-            <Button variant="success" onClick={handleAddEvent}>Αποθήκευση</Button>
+            }}>Cancel</Button>
+            <Button variant="success" onClick={handleAddEvent}>Save</Button>
           </Modal.Footer>
         </Modal>
       )}

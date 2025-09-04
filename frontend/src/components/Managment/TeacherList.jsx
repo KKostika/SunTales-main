@@ -127,7 +127,7 @@ function TeacherList() {
       </Table>
 
       {/* Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} centeredonHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>{editingTeacher ? 'Edit Teacher' : 'Add New Teacher'}</Modal.Title>
         </Modal.Header>

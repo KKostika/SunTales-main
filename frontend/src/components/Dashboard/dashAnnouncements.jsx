@@ -44,7 +44,7 @@ const DashboardAnnouncements = ({ role }) => {
           {role === 'admin' && (
             <Col className="text-end">
               <Button variant="primary" onClick={() => setShowAnnouncementModal(true)}>
-                ➕ Προσθήκη Ανακοίνωσης
+                Add Announcement
               </Button>
             </Col>
           )}
@@ -108,12 +108,12 @@ const DashboardAnnouncements = ({ role }) => {
           centered
         >
           <Modal.Header closeButton>
-            <Modal.Title>Νέα Ανακοίνωση</Modal.Title>
+            <Modal.Title>Add Announcement</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
               <Form.Group className="mb-3">
-                <Form.Label>Τίτλος</Form.Label>
+                <Form.Label>Title</Form.Label>
                 <Form.Control
                   type="text"
                   value={newAnnouncement.title}
@@ -121,7 +121,7 @@ const DashboardAnnouncements = ({ role }) => {
                 />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Περίληψη</Form.Label>
+                <Form.Label>Summary</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
@@ -131,7 +131,7 @@ const DashboardAnnouncements = ({ role }) => {
                 />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Ημερομηνία</Form.Label>
+                <Form.Label>Date</Form.Label>
                 <Form.Control
                   type="date"
                   value={newAnnouncement.date}
@@ -141,8 +141,8 @@ const DashboardAnnouncements = ({ role }) => {
             </Form>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowAnnouncementModal(false)}>Άκυρο</Button>
-            <Button variant="success" onClick={handleAddAnnouncement}>Αποθήκευση</Button>
+            <Button variant="secondary" onClick={() => setShowAnnouncementModal(false)}>Cancel</Button>
+            <Button variant="success" onClick={handleAddAnnouncement}>Save</Button>
           </Modal.Footer>
         </Modal>
       </Container>

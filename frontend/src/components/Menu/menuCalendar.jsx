@@ -53,7 +53,7 @@ function WeeklyMenuCalendar() {
           events={menuEvents}
           dateClick={handleDateClick}
           height="auto"
-          locale="el"
+          
         />
       </div>
 

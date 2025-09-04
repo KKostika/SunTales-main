@@ -176,7 +176,7 @@ AUTH_USER_MODEL = 'products.User'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", 
-    "http://127.0.0.1:5173", # 👈 Πρέπει να ταιριάζει ΑΚΡΙΒΩΣ με το origin του frontend
+    "http://127.0.0.1:5173", # 👈 This has to be perfectly matched with the frontend's origin
 ]
 
 CORS_ALLOW_CREDENTIALS = True

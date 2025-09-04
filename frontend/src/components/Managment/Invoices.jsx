@@ -145,7 +145,7 @@ function FinancialRecords() {
 
       {/* Modal */}
       {role !== 'parent' && (
-        <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal show={showModal} centered onHide={() => setShowModal(false)}>
           <Modal.Header closeButton>
             <Modal.Title>{editingRecord ? 'Edit Record' : 'Add New Record'}</Modal.Title>
           </Modal.Header>

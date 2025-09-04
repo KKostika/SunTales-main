@@ -108,7 +108,7 @@ useEffect(() => {
       )}
 
       {/* 📋 Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+      <Modal show={showModal} centered onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Meal Details</Modal.Title>
         </Modal.Header>
