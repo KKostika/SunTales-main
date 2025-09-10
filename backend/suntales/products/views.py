@@ -349,11 +349,11 @@ class DailyMenuViewSet(viewsets.ModelViewSet):
     permission_classes = [HasRolePermission]
     allowed_roles = ['admin', 'parent', 'teacher']
 
-class MessagesViewSet(viewsets.ModelViewSet):
-    queryset = Messages.objects.all()
-    serializer_class = MessagesSerializer
-    permission_classes = [HasRolePermission]
-    allowed_roles = ['admin', 'teacher', 'parent']
+# class MessagesViewSet(viewsets.ModelViewSet):
+#     queryset = Messages.objects.all()
+#     serializer_class = MessagesSerializer
+#     permission_classes = [HasRolePermission]
+#     allowed_roles = ['admin', 'teacher', 'parent']
 
 
 class ActivitiesPhotoViewSet(viewsets.ModelViewSet):
@@ -399,11 +399,11 @@ class ActivitiesViewSet(viewsets.ModelViewSet):
 
 
 
-class MeetingsViewSet(viewsets.ModelViewSet):
-    queryset = Meetings.objects.all()
-    serializer_class = MeetingsSerializer
-    permission_classes = [HasRolePermission]
-    allowed_roles = ['admin', 'teacher', 'parent']
+# class MeetingsViewSet(viewsets.ModelViewSet):
+#     queryset = Meetings.objects.all()
+#     serializer_class = MeetingsSerializer
+#     permission_classes = [HasRolePermission]
+#     allowed_roles = ['admin', 'teacher', 'parent']
 
 
 
