@@ -61,6 +61,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     allowed_roles = ['admin', 'teacher', 'parent']
 
     def get_queryset(self):
+        #Parents see only their kid, Teachers see only their students
         user = self.request.user
         if not user.is_authenticated:
             return Student.objects.none()
@@ -91,7 +92,7 @@ class StudentViewSet(viewsets.ModelViewSet):
             if not student.parents.filter(user=user).exists():
                 return Response({'error': 'Not allowed'}, status=status.HTTP_403_FORBIDDEN)
 
-            # Περιορίζουμε τα πεδία που μπορεί να ενημερώσει ο γονέας
+            # Parents can update only medical info
             allowed_fields = ['allergies']
             data = {field: request.data[field] for field in allowed_fields if field in request.data}
 
@@ -100,10 +101,11 @@ class StudentViewSet(viewsets.ModelViewSet):
             self.perform_update(serializer)
             return Response(serializer.data)
 
-        # Για admin/teacher συνεχίζουμε κανονικά
+        # admin/teeacher full permission
         return super().update(request, *args, **kwargs)
 
     @action(detail=True, methods=['post'], url_path='meals')
+    #used by teacher or admin for daily tracking meals
     def track_meal(self, request, pk=None):
         student = self.get_object()
         status_level = request.data.get('status')
@@ -125,6 +127,8 @@ class StudentViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([HasRolePermission])
 def teacher_list(request):
+    # Επιστρέφει λίστα με όλους τους δασκάλους.
+
     teachers = Teacher.objects.select_related('user').all()
     data = [
         {
@@ -140,10 +144,10 @@ def teacher_list(request):
 
 
 class ParentList(APIView):
-    """
-    Επιστρέφει λίστα όλων των Parent instances.
-    Ελέγχει authentication και role-based authorization.
-    """
+    
+    # Επιστρέφει λίστα όλων των Parent instances.
+    # Ελέγχει authentication και role-based authorization.
+    
     permission_classes = [ HasRolePermission]
     allowed_roles      = ['admin', 'teacher', 'parent']
 
@@ -166,6 +170,7 @@ class ParentList(APIView):
 
 
 class TeacherViewSet(viewsets.ModelViewSet):
+    # Filtering by classroom 
     queryset = Teacher.objects.select_related('user') \
                               .prefetch_related('classrooms')
     serializer_class = TeacherSerializer
@@ -254,6 +259,9 @@ class ClassroomViewSet(viewsets.ModelViewSet):
     allowed_roles = ['admin', 'teacher', 'parent']
 
     def get_queryset(self):
+        # Parents have access in their kids classrooms 
+        # Teachers have access in their classrooms 
+        
         user = self.request.user
         role = getattr(user, 'role', None)
 
@@ -279,6 +287,7 @@ class ClassroomViewSet(viewsets.ModelViewSet):
 
 
 class FinancialRecordViewSet(viewsets.ModelViewSet):
+    # Parents have access only in their kids financial Records
     queryset = FinancialRecord.objects.all()
     serializer_class = FinancialRecordSerializer
     permission_classes = [HasRolePermission]
@@ -368,6 +377,9 @@ class ActivitiesViewSet(viewsets.ModelViewSet):
     allowed_roles = ['admin', 'teacher', 'parent']
 
     def get_queryset(self):
+        # Admin - Full Access
+        # Teacher - Access only in classrooms activities
+        # Parent - Access only in their kids Classroom
         user = self.request.user
         role = getattr(user, 'role', None)
 
@@ -427,6 +439,7 @@ class UpdateMedicalInfo(viewsets.ModelViewSet):
         return Response(serializer.errors, status=400)
     
 class UserViewSet(viewsets.ModelViewSet):
+    #Admin is the only one with Access 
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     permission_classes = [HasRoleAdminPermission]
