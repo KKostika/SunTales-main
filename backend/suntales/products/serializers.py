@@ -310,24 +310,24 @@ class ActivitiesSerializer(serializers.ModelSerializer):
 
 
 
-class MessagesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Messages
-        fields = '__all__'
+# class MessagesSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Messages
+#         fields = '__all__'
 
-class MeetingsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Meetings
-        fields = '__all__'  
+# class MeetingsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Meetings
+#         fields = '__all__'  
 
-    def __str__(self):
-        return f"{self.name} on {self.date} at {self.time}"
+#     def __str__(self):
+#         return f"{self.name} on {self.date} at {self.time}"
     
 
-class MedicalInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MedicalInfo
-        fields = "__all__"
+# class MedicalInfoSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = MedicalInfo
+#         fields = "__all__"
 
 
 
