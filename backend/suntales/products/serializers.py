@@ -26,6 +26,7 @@ class ParentSerializer(serializers.ModelSerializer):
         read_only_fields = ['name', 'first_name', 'last_name', 'email']
 
     def get_student(self, obj):
+        #Returns list with the parent's kids
         return [
             {
                 'id': s.id,
@@ -43,6 +44,7 @@ class ParentSerializer(serializers.ModelSerializer):
         return full_name or "Unnamed"
 
     def get_activities(self, obj):
+        #returns Activities from the kids classroom
         student = Student.objects.filter(parents=obj).first()
         if student and student.classroom:
             activities = Activities.objects.filter(classroom_id=student.classroom.id)
@@ -78,6 +80,8 @@ class ClassroomSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'teacher', 'students']
 
     def get_students(self, obj):
+        # Parent only their kids
+        # Teachers only their students
         user = self.context['request'].user
         role = getattr(user, 'role', None)
 
@@ -236,7 +240,8 @@ class MealsSerializer(serializers.ModelSerializer):
         student = data.get('student')
         meal = data.get('meal')
         date = data.get('date')
-
+        
+# custom validation για αποφυγή διπλών εγγραφών ανά μαθητή, ημερομηνία και τύπο γεύματος.
         if Meals.objects.filter(student=student, meal=meal, date=date).exists():
             raise serializers.ValidationError(
                 f"Meal '{meal}' for student '{student}' on {date} already exists."
