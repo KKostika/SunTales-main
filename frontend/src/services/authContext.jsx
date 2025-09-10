@@ -8,8 +8,10 @@ import {
   logout,
 } from './authServices';
 
+// Creates a global authentication context to share auth state across the app
 export const AuthContext = createContext();
 
+// wraps the app and provides authentication-related data and functions
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState(null);
@@ -32,7 +34,8 @@ export const AuthProvider = ({ children }) => {
 
     checkAuth();
   }, []);
-
+  
+  // Provides auth state and logout function to all child components
   return (
     <AuthContext.Provider value={{ isAuthenticated, role, user, logout }}>
       {children}
