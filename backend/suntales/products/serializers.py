@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Activities, Announcement, Classroom, FinancialRecord, Meals, Meetings, Messages, Parent, Student, Teacher, MedicalInfo, DailyMenu, ActivitiesPhoto, Event, Announcement
+from .models import Activities, Announcement, Classroom, FinancialRecord, Meals, Parent, Student, Teacher, MedicalInfo, DailyMenu, ActivitiesPhoto, Event, Announcement
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
 
