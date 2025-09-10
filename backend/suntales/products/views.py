@@ -27,8 +27,6 @@ from .models import (
     FinancialRecord, 
     Meals, 
     Activities, 
-    Messages, 
-    Meetings,
     DailyMenu,
     Event,
     Announcement
@@ -47,9 +45,7 @@ from .serializers import (
     ClassroomSerializer,
     FinancialRecordSerializer,
     MealsSerializer,
-    MessagesSerializer,
     ActivitiesSerializer,
-    MeetingsSerializer,
     MyTokenObtainPairSerializer,
     UserSerializer,
     ActivitiesPhotoSerializer,
