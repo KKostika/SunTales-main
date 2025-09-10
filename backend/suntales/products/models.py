@@ -170,25 +170,25 @@ class ActivitiesPhoto(models.Model):
     def __str__(self):
         return f"Photo for {self.activity.name}"
     
-class Messages(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    parent = models.ForeignKey(Parent, on_delete=models.CASCADE)
-    administrator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    date_sent = models.DateTimeField(auto_now_add=True)
-    content = models.TextField()
+# class Messages(models.Model):
+#     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+#     parent = models.ForeignKey(Parent, on_delete=models.CASCADE)
+#     administrator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+#     date_sent = models.DateTimeField(auto_now_add=True)
+#     content = models.TextField()
 
-    def __str__(self):
-        return f"Message from {self.teacher.name} to {self.parent.name} on {self.date_sent}"
+#     def __str__(self):
+#         return f"Message from {self.teacher.name} to {self.parent.name} on {self.date_sent}"
     
-class Meetings(models.Model):
-    date = models.DateField()
-    time = models.TimeField()
-    location = models.CharField(max_length=255)
-    agenda = models.TextField(blank=True)
-    participants = models.ManyToManyField(Teacher, blank=True)
+# class Meetings(models.Model):
+#     date = models.DateField()
+#     time = models.TimeField()
+#     location = models.CharField(max_length=255)
+#     agenda = models.TextField(blank=True)
+#     participants = models.ManyToManyField(Teacher, blank=True)
 
-    def __str__(self):
-        return f"Meeting on {self.date} at {self.time} - {self.location}"
+#     def __str__(self):
+#         return f"Meeting on {self.date} at {self.time} - {self.location}"
 
 
 class User(AbstractUser):
