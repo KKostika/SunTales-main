@@ -14,6 +14,7 @@ export const setTokens = (access, refresh) => {
   localStorage.setItem(REFRESH_KEY, refresh);
 };
 
+// Clears all stored tokens and user info from localStorage
 export const clearTokens = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_KEY);
@@ -40,7 +41,7 @@ export const getUserInfo = () => ({
 
 export const getRole = () => localStorage.getItem(ROLE_KEY);
 
-// 🔓 Login
+// 🔓 Sends login request to backend and stores tokens + user info on success
 export const login = async (email, password) => {
   try {
     const response = await axios.post('/api/login/', { email, password });
@@ -56,12 +57,11 @@ export const login = async (email, password) => {
   }
 };
 
-// 🚪 Logout
+// 🚪 Logout Clears tokens and redirects user to login page
 export const logout = () => {
   clearTokens();
   localStorage.setItem(LOGOUT_KEY, Date.now());
-  window.location.href = '/login'; // Αν έχεις React Router, αντικατάστησέ το με navigate()
-};
+  window.location.href = '/login'; 
 
 // 🔁 Refresh Access Token
 export const refreshAccessToken = async () => {
@@ -80,7 +80,7 @@ export const refreshAccessToken = async () => {
   }
 };
 
-// ✅ Check if Logged In
+// ✅ Check if access token exists and is still valid (not expired)
 export const isLoggedIn = () => {
   const token = getAccessToken();
   if (!token) return false;
@@ -112,14 +112,14 @@ export const setupAutoLogout = () => {
   }
 };
 
-// ⏳ Optional: Auto Refresh Before Expiry
+// ⏳ Auto refreshes access token 1 minute before expiration
 export const setupAutoRefresh = () => {
   const token = getAccessToken();
   if (!token) return;
 
   try {
     const decoded = jwtDecode(token);
-    const refreshTime = decoded.exp * 1000 - Date.now() - 60000; // 1 λεπτό πριν λήξει
+    const refreshTime = decoded.exp * 1000 - Date.now() - 60000; 
 
     if (refreshTime > 0) {
       setTimeout(() => {
