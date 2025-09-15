@@ -164,6 +164,7 @@ venv – Python virtual environment
 
 
 --> Project Flow <--
+
 To ensure a smooth setup and operation, here's the recommended workflow for Admin users:
 
 ➕ Add Classrooms Start by creating classroom entries.
